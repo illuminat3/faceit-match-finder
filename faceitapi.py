@@ -1,40 +1,31 @@
-import requests
+from api import *
 
-def extractAccountId(username):
-    idUrl = f"https://www.faceit.com/api/users/v1/nicknames/{username}"
+def ExtractAccountId(username):
+    url = f"https://www.faceit.com/api/users/v1/nicknames/{username}"
     
     try:
-        response = requests.get(idUrl)
-        response.raise_for_status() 
-
-        data = response.json()
+        data = GetJsonFromUrlRequest(url)
         playerId = data['payload']['id']
         
         return playerId
-    except requests.exceptions.RequestException as e:
-        print(f"Error making request: {e}")
-    except KeyError:
+    except:
         print("playerId not found in the response")
         return None
     
-def extractMatchCount(userId):
+def ExtractMatchCount(userId):
     url = f"https://www.faceit.com/api/stats/v1/stats/users/{userId}/games/csgo"
     
     try:
-        response = requests.get(url)
-        response.raise_for_status()  
+        data = GetJsonFromUrlRequest(url)
 
-        data = response.json()
         m1_value = data['lifetime']['m1']
         
         return m1_value
-    except requests.exceptions.RequestException as e:
-        print(f"Error making request: {e}")
-    except KeyError:
+    except:
         print("m1 value not found in the response")
         return None
     
-def isGameFound(user_id, match_count, t_score, ct_score):
+def IsGameFound(user_id, match_count, t_score, ct_score):
     match_url = f"https://www.faceit.com/api/stats/v1/stats/time/users/{user_id}/games/csgo?page=0&size={match_count}"
 
     search_string_1 = f"\"i18\":\"{t_score}"
